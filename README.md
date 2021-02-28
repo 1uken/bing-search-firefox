@@ -14,11 +14,11 @@ Automation of Bing searches with the Firefox browser. For educational purposes o
     * https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
     
 ## Instructions:
-1. Make appropriate changes to the "bing_search_firefox.config" file for your enviroment:
+1. Make appropriate changes to the "bing-search-firefox.config" file for your enviroment:
     * run_mode : (1) desktop mode, (2) mobile mode, (3) or both
     * profile_path : Firefox profile directory (usually in your home directory) (optional)
     * driver_path : Gecko webdriver binary (should be in root directory)
     * auto_login : Automatically log in to Microsoft account (optional)
     * username : Microsoft account login email/id (optional)
     * password : Microsoft account login password (optional)
-2. Run the "bing_search_firefox.py" file.
+2. Run the "bing-search-firefox.py" file.
