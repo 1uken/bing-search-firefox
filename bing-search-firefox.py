@@ -112,30 +112,38 @@ try:
         list_of_words = config_file.read().split()
 
     num_loaded = 0
-    num_total = 6
+    num_total = 8
     # Look for the settings we care about and try to parse
     for index, word in enumerate(list_of_words):
-        if (word == "run_mode" and list_of_words[index + 1] == "="):        # 1
+        if (word == "run_mode" and list_of_words[index + 1] == "="):            # 1
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 run_mode = int(list_of_words[index + 2][1:-1])
                 num_loaded += 1
-        elif (word == "profile_path" and list_of_words[index + 1] == "="):  # 2
+        elif (word == "desktop_search" and list_of_words[index + 1] == "="):    # 2
+            if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
+                desktop_search = int(list_of_words[index + 2][1:-1])
+                num_loaded += 1
+        elif (word == "mobile_search" and list_of_words[index + 1] == "="):     # 3
+            if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
+                mobile_search = int(list_of_words[index + 2][1:-1])
+                num_loaded += 1
+        elif (word == "profile_path" and list_of_words[index + 1] == "="):      # 4
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 profile_path = Path(list_of_words[index + 2][1:-1])
                 num_loaded += 1
-        elif (word == "driver_path" and list_of_words[index + 1] == "="):   # 3
+        elif (word == "driver_path" and list_of_words[index + 1] == "="):       # 5
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 driver_path = Path(list_of_words[index + 2][1:-1])
                 num_loaded += 1
-        elif (word == "auto_login" and list_of_words[index + 1] == "="):    # 4
+        elif (word == "auto_login" and list_of_words[index + 1] == "="):        # 6
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 auto_login = (list_of_words[index + 2][1:-1] == "True")
                 num_loaded += 1
-        elif (word == "my_username" and list_of_words[index + 1] == "="):   # 5
+        elif (word == "my_username" and list_of_words[index + 1] == "="):       # 7
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 my_username = list_of_words[index + 2][1:-1]
                 num_loaded += 1
-        elif (word == "my_password" and list_of_words[index + 1] == "="):   # 6
+        elif (word == "my_password" and list_of_words[index + 1] == "="):       # 8
             if (list_of_words[index + 2][0] == "\"" and list_of_words[index + 2][-1] == "\""):
                 my_password = list_of_words[index + 2][1:-1]
                 num_loaded += 1
@@ -160,9 +168,11 @@ for loop in range(2):
         
         printLog("Creating profile...")
         profile = webdriver.FirefoxProfile(profile_path)
+        # Set user-agent to Edge browser
+        profile.set_preference('general.useragent.override', "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36 Edg/89.0.774.48")
         if (run_mode == 2):
-            # Sets user-agent to mobile browser (Firefox for Android)
-            profile.set_preference('general.useragent.override', "Mozilla/5.0 (Android 9; Mobile; rv:68) Gecko/68.0 Firefox/68.0")
+            # Set user-agent to Chrome on Android
+            profile.set_preference('general.useragent.override', "Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.86 Mobile Safari/537.36")
         profile.set_preference('dom.webnotifications.enabled', False)
         profile.set_preference('app.update.enabled', False)
         profile.set_preference('geo.enabled', False)
@@ -202,16 +212,19 @@ for loop in range(2):
         printLog("Opening Bing homepage and waiting for 10 seconds...")
         loadWebPage('https://www.bing.com')
         time.sleep(10)
+        printLog("Opening Rewards page and waiting for 10 seconds...")
+        loadWebPage('https://account.microsoft.com/rewards/')
+        time.sleep(10)
 
         # Set 'word_path' to path of the word list text file (should be in root directory)
         word_path = Path('.\\10K-english-longwords.txt')
         with open(word_path, 'r') as word_list:
             if (run_mode == 1 or run_mode == 3):
-                # Create list for desktop searches; 30 words
-                random_words = random.sample(word_list.read().splitlines(), 30)
+                # Create list for desktop searches
+                random_words = random.sample(word_list.read().splitlines(), desktop_search)
             elif (run_mode == 2):
-                # Create list for mobile searches; 20 words w/ 10 extra
-                random_words = random.sample(word_list.read().splitlines(), 30)
+                # Create list for mobile searches
+                random_words = random.sample(word_list.read().splitlines(), mobile_search)
             else:
                 raise Exception("Run mode value is invalid! Must be 1, 2, or 3.")
         printLog("{0} words selected from {1}".format(len(random_words), word_path))
